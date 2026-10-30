@@ -1,0 +1,16 @@
+{
+  "name": "apidl-hls-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HLS stream proxy API - /apidl?url=<m3u8> with auto headers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
