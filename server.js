@@ -14,6 +14,8 @@
 const http = require("http");
 const { Readable } = require("stream");
 const { spawn } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
 const PORT = process.env.PORT || 3000;
 
@@ -30,11 +32,16 @@ const CORS = {
   "Access-Control-Allow-Headers": "*",
 };
 
-let FFMPEG = "ffmpeg";
-try {
-  FFMPEG = require("ffmpeg-static") || "ffmpeg";
-} catch {
-  /* system ffmpeg fallback */
+// ---- ffmpeg resolution: ./ffmpeg (BtbN static) -> ffmpeg-static -> system ----
+let FFMPEG = path.join(__dirname, "ffmpeg");
+if (!fs.existsSync(FFMPEG)) {
+  try {
+    const st = require("ffmpeg-static");
+    if (st && fs.existsSync(st)) FFMPEG = st;
+    else FFMPEG = "ffmpeg";
+  } catch {
+    FFMPEG = "ffmpeg";
+  }
 }
 
 // ---------------- helpers ----------------
@@ -311,10 +318,15 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  let ffmpegInfo = "system";
-  if (FFMPEG !== "ffmpeg") {
-    const fs = require("fs");
-    ffmpegInfo = `${FFMPEG} exists=${fs.existsSync(FFMPEG)}`;
+  let ffmpegInfo = FFMPEG;
+  try {
+    const v = require("child_process")
+      .execSync(`"${FFMPEG}" -version 2>&1 | head -1`, { timeout: 10000 })
+      .toString()
+      .trim();
+    ffmpegInfo = `${FFMPEG} | ${v}`;
+  } catch (e) {
+    ffmpegInfo = `${FFMPEG} | VERSION CHECK FAILED: ${e.message}`;
   }
-  console.log(`[apidl] HLS proxy API listening on port ${PORT} (ffmpeg: ${ffmpegInfo})`);
+  console.log(`[apidl] listening on ${PORT} | ffmpeg: ${ffmpegInfo}`);
 });

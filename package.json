@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "postinstall": "node node_modules/ffmpeg-static/install.js"
+    "postinstall": "node setup-ffmpeg.js"
   },
   "dependencies": {
     "ffmpeg-static": "^5.2.0"
