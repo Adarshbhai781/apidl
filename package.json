@@ -5,7 +5,8 @@
   "description": "HLS stream proxy API - /apidl?url=<m3u8> with auto headers",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "postinstall": "node node_modules/ffmpeg-static/install.js"
   },
   "dependencies": {
     "ffmpeg-static": "^5.2.0"

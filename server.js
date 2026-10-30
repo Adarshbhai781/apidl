@@ -154,8 +154,8 @@ function mp4Download(target, headers, req, res) {
     console.error("[apidl] ffmpeg spawn error:", e.message);
     if (!res.headersSent) sendError(res, 500, "ffmpeg not available for dl=1");
   });
-  proc.on("close", (code) => {
-    if (code && code !== 255) console.error("[apidl] ffmpeg exited", code, stderr);
+  proc.on("close", (code, sig) => {
+    console.log(`[apidl] ffmpeg closed code=${code} sig=${sig} stderr=${stderr.slice(-300)}`);
     if (!res.writableEnded) res.end();
   });
 
@@ -311,5 +311,10 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`[apidl] HLS proxy API listening on port ${PORT} (ffmpeg: ${FFMPEG !== "ffmpeg" ? "bundled" : "system"})`);
+  let ffmpegInfo = "system";
+  if (FFMPEG !== "ffmpeg") {
+    const fs = require("fs");
+    ffmpegInfo = `${FFMPEG} exists=${fs.existsSync(FFMPEG)}`;
+  }
+  console.log(`[apidl] HLS proxy API listening on port ${PORT} (ffmpeg: ${ffmpegInfo})`);
 });

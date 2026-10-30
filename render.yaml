@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm install
+    buildCommand: npm install && node node_modules/ffmpeg-static/install.js
     startCommand: npm start
     healthCheckPath: /
     envVars:
